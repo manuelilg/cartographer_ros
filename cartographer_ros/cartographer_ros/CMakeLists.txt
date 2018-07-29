@@ -17,6 +17,8 @@ google_binary(cartographer_assets_writer
     assets_writer_main.cc
     ros_map_writing_points_processor.h
     ros_map_writing_points_processor.cc
+    z_pos_filtering_points_processor.h
+    z_pos_filtering_points_processor.cc
 )
 
 install(TARGETS cartographer_assets_writer
