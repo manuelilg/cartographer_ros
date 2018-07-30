@@ -38,6 +38,7 @@
 #include "cartographer_ros/split_string.h"
 #include "cartographer_ros/time_conversion.h"
 #include "cartographer_ros/urdf_reader.h"
+#include "cartographer_ros/z_pos_filtering_points_processor.h"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
 #include "ros/ros.h"
@@ -64,6 +65,19 @@ CreatePipelineBuilder(
   auto builder = absl::make_unique<carto::io::PointsProcessorPipelineBuilder>();
   carto::io::RegisterBuiltInPointsProcessors(trajectories, file_writer_factory,
                                              builder.get());
+
+/*  AssetsWriter::RegisterPointsProcessor(ZPositionFilteringPointsProcessor::kConfigurationFileActionName,
+                          [](carto::common::LuaParameterDictionary* const dictionary,
+                              carto::io::PointsProcessor* const next) -> std::unique_ptr<carto::io::PointsProcessor> {
+                            return ZPositionFilteringPointsProcessor::FromDictionary(dictionary, next);
+                           });*/
+
+  builder->Register(ZPositionFilteringPointsProcessor::kConfigurationFileActionName,
+                          [](carto::common::LuaParameterDictionary* const dictionary,
+                              carto::io::PointsProcessor* const next) -> std::unique_ptr<carto::io::PointsProcessor> {
+                            return ZPositionFilteringPointsProcessor::FromDictionary(dictionary, next);
+                           });
+
   builder->Register(RosMapWritingPointsProcessor::kConfigurationFileActionName,
                     [file_writer_factory](
                         carto::common::LuaParameterDictionary* const dictionary,
@@ -157,6 +171,7 @@ AssetsWriter::AssetsWriter(const std::string& pose_graph_filename,
                                       : bag_filenames_.front() + "_";
   point_pipeline_builder_ =
       CreatePipelineBuilder(all_trajectories_, file_prefix);
+
 }
 
 void AssetsWriter::RegisterPointsProcessor(

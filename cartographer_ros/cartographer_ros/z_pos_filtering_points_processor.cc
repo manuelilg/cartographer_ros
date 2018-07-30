@@ -20,28 +20,27 @@
 #include "cartographer/common/lua_parameter_dictionary.h"
 #include "cartographer/io/points_batch.h"
 
-namespace cartographer {
-namespace io {
+namespace cartographer_ros {
 
-std::unique_ptr<ZPositionFiteringPointsProcessor>
-ZPositionFiteringPointsProcessor::FromDictionary(
-    common::LuaParameterDictionary* const dictionary,
+std::unique_ptr<ZPositionFilteringPointsProcessor>
+ZPositionFilteringPointsProcessor::FromDictionary(
+    cartographer::common::LuaParameterDictionary* const dictionary,
     PointsProcessor* const next) {
-  return absl::make_unique<ZPositionFiteringPointsProcessor>(
+  return absl::make_unique<ZPositionFilteringPointsProcessor>(
       dictionary->GetDouble("min_z"), dictionary->GetDouble("max_z"),
       next);
 }
 
-ZPositionFiteringPointsProcessor::ZPositionFiteringPointsProcessor(
+ZPositionFilteringPointsProcessor::ZPositionFilteringPointsProcessor(
     const double min_z, const double max_z, PointsProcessor* next)
     : min_z_(min_z), max_z_(max_z), next_(next) {}
 
-void ZPositionFiteringPointsProcessor::Process(
-    std::unique_ptr<PointsBatch> batch) {
+void ZPositionFilteringPointsProcessor::Process(
+    std::unique_ptr<cartographer::io::PointsBatch> batch) {
   std::unordered_set<int> to_remove;
   for (size_t i = 0; i < batch->points.size(); ++i) {
     const float pos = (batch->points[i] - batch->origin).z();
-    if (!(min_z_ >= pos && pos >= max_z_)) {
+    if (!(min_z_ <= pos && pos <= max_z_)) {
       to_remove.insert(i);
     }
   }
@@ -49,9 +48,8 @@ void ZPositionFiteringPointsProcessor::Process(
   next_->Process(std::move(batch));
 }
 
-PointsProcessor::FlushResult ZPositionFiteringPointsProcessor::Flush() {
+  cartographer::io::PointsProcessor::FlushResult ZPositionFilteringPointsProcessor::Flush() {
   return next_->Flush();
 }
 
-}  // namespace io
-}  // namespace cartographer
+}  // namespace cartographer_ros

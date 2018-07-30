@@ -22,37 +22,35 @@
 #include "cartographer/common/lua_parameter_dictionary.h"
 #include "cartographer/io/points_processor.h"
 
-namespace cartographer {
-namespace io {
+namespace cartographer_ros {
 
 // Filters all points that have a z-position (relative to the 'origin') over 'max_z'
 // or under 'min_z'.
-class ZPositionFiteringPointsProcessor : public PointsProcessor {
+class ZPositionFilteringPointsProcessor : public cartographer::io::PointsProcessor {
  public:
   constexpr static const char* kConfigurationFileActionName =
       "z_pos_filter";
-  ZPositionFiteringPointsProcessor(double min_z, double max_z,
+  ZPositionFilteringPointsProcessor(double min_z, double max_z,
                                      PointsProcessor* next);
-  static std::unique_ptr<ZPositionFiteringPointsProcessor> FromDictionary(
-      common::LuaParameterDictionary* dictionary, PointsProcessor* next);
+  static std::unique_ptr<ZPositionFilteringPointsProcessor> FromDictionary(
+      cartographer::common::LuaParameterDictionary* dictionary, PointsProcessor* next);
 
-  ~ZPositionFiteringPointsProcessor() override {}
+  ~ZPositionFilteringPointsProcessor() override {}
 
-  ZPositionFiteringPointsProcessor(
-      const ZPositionFiteringPointsProcessor&) = delete;
-  ZPositionFiteringPointsProcessor& operator=(
-      const ZPositionFiteringPointsProcessor&) = delete;
+  ZPositionFilteringPointsProcessor(
+      const ZPositionFilteringPointsProcessor&) = delete;
+  ZPositionFilteringPointsProcessor& operator=(
+      const ZPositionFilteringPointsProcessor&) = delete;
 
-  void Process(std::unique_ptr<PointsBatch> batch) override;
+  void Process(std::unique_ptr<cartographer::io::PointsBatch> batch) override;
   FlushResult Flush() override;
 
  private:
   const double min_z_;
   const double max_z_;
-  PointsProcessor* const next_;
+  cartographer::io::PointsProcessor* const next_;
 };
 
-}  // namespace io
-}  // namespace cartographer
+}  // namespace cartographer_ros
 
 #endif  // CARTOGRAPHER_ROS_CARTOGRAPHER_ROS_Z_POSITION_FILTERING_POINTS_PROCESSOR_H_
